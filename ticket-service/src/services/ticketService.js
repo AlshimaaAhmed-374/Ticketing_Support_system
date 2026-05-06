@@ -64,8 +64,11 @@ const updateTicket = async (ticketId, payload, user, isInternal) => {
 
   if (!isInternal) {
     if (user.role !== "admin") throw { statusCode: 403, message: "Only admin can update tickets" };
-    if (payload.status && payload.status !== "in-progress") {
-      throw { statusCode: 400, message: "Admin can only move status to in-progress during assignment" };
+    if (payload.assignedAgentId !== undefined || payload.assignedAgentName !== undefined || payload.status !== undefined) {
+      throw {
+        statusCode: 400,
+        message: "Admin ticket updates are limited to priority. Use support-service assignment and resolution workflows."
+      };
     }
   }
 

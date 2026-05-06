@@ -1,0 +1,54 @@
+import { useEffect, useState } from "react";
+import { getReport } from "../services/reportingService";
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import { useToast } from "../hooks/useToast";
+import { parseApiError } from "../api/axiosClient";
+
+export const ReportsPage = () => {
+  const toast = useToast();
+  const [report, setReport] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        setReport(await getReport());
+      } catch (error) {
+        toast.error(parseApiError(error));
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  if (loading) return <LoadingSpinner />;
+  if (!report) return <p className="empty-text">No report data.</p>;
+
+  return (
+    <div>
+      <h2>Reporting Dashboard</h2>
+      <div className="stat-grid">
+        <div className="card">Total: {report.totalTickets}</div>
+        <div className="card">Open: {report.openTickets}</div>
+        <div className="card">In Progress: {report.inProgressTickets}</div>
+        <div className="card">Closed: {report.closedTickets}</div>
+        <div className="card">High Priority: {report.highPriorityTickets}</div>
+        <div className="card">Avg Responses/Ticket: {report.averageResponsesPerTicket}</div>
+      </div>
+      <div className="card">
+        <h3>Resolved Tickets Per Agent</h3>
+        {!Object.keys(report.resolvedTicketsPerAgent || {}).length ? (
+          <p className="empty-text">No resolved tickets yet.</p>
+        ) : (
+          <ul>
+            {Object.entries(report.resolvedTicketsPerAgent).map(([agent, count]) => (
+              <li key={agent}>{agent}: {count}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+};
