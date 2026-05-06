@@ -1,0 +1,110 @@
+services:
+  mongo-auth:
+    image: mongo:7
+    container_name: mongo-auth
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_auth_data:/data/db
+    networks:
+      - support-net
+
+  mongo-ticket:
+    image: mongo:7
+    container_name: mongo-ticket
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_ticket_data:/data/db
+    networks:
+      - support-net
+
+  mongo-support:
+    image: mongo:7
+    container_name: mongo-support
+    restart: unless-stopped
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo_support_data:/data/db
+    networks:
+      - support-net
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    env_file:
+      - ./auth-service/.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo-auth
+    networks:
+      - support-net
+
+  ticket-service:
+    build:
+      context: ./ticket-service
+      dockerfile: Dockerfile
+    env_file:
+      - ./ticket-service/.env
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongo-ticket
+    networks:
+      - support-net
+
+  support-service:
+    build:
+      context: ./support-service
+      dockerfile: Dockerfile
+    env_file:
+      - ./support-service/.env
+    ports:
+      - "5002:5002"
+    depends_on:
+      - mongo-support
+      - auth-service
+      - ticket-service
+      - notification-service
+      - reporting-service
+    networks:
+      - support-net
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    env_file:
+      - ./notification-service/.env
+    ports:
+      - "5003:5003"
+    networks:
+      - support-net
+
+  reporting-service:
+    build:
+      context: ./reporting-service
+      dockerfile: Dockerfile
+    env_file:
+      - ./reporting-service/.env
+    ports:
+      - "5004:5004"
+    depends_on:
+      - ticket-service
+      - support-service
+    networks:
+      - support-net
+
+networks:
+  support-net:
+    driver: bridge
+
+volumes:
+  mongo_auth_data:
+  mongo_ticket_data:
+  mongo_support_data:
