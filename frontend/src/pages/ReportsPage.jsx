@@ -35,7 +35,6 @@ export const ReportsPage = () => {
         <div className="card">In Progress: {report.inProgressTickets}</div>
         <div className="card">Closed: {report.closedTickets}</div>
         <div className="card">High Priority: {report.highPriorityTickets}</div>
-        <div className="card">Avg Responses/Ticket: {report.averageResponsesPerTicket}</div>
       </div>
       <div className="card">
         <h3>Resolved Tickets Per Agent</h3>
