@@ -78,13 +78,12 @@ export const UserDashboardPage = () => {
       ) : (
         <div className="table-wrap">
           <table>
-            <thead><tr><th>Title</th><th>Status</th><th>Priority</th><th>Assigned Agent</th></tr></thead>
+            <thead><tr><th>Title</th><th>Status</th><th>Assigned Agent</th></tr></thead>
             <tbody>
               {tickets.map((ticket) => (
                 <tr key={ticket._id}>
                   <td><Link to={`/tickets/${ticket._id}`}>{ticket.title}</Link></td>
                   <td><StatusBadge status={ticket.status} /></td>
-                  <td><PriorityBadge priority={ticket.priority} /></td>
                   <td>{ticket.assignedAgentName || "-"}</td>
                 </tr>
               ))}
