@@ -19,9 +19,19 @@ const fetchTicket = async (ticketId, token) => {
 
 const fetchTicketInternal = async (ticketId) => {
   try {
-    const { data } = await ticketClient.get(`/tickets/internal/${ticketId}`, internalHeaders());
+    const url = `/tickets/internal/${ticketId}`;
+    console.log("CALLING:", process.env.TICKET_SERVICE_URL + url);
+
+    const { data } = await ticketClient.get(url, internalHeaders());
+
     return data.data;
-  } catch (_error) {
+  } catch (error) {
+    console.log("TICKET SERVICE ERROR:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url
+    });
+
     throw { statusCode: 404, message: "Ticket not found" };
   }
 };
@@ -39,7 +49,7 @@ const assignTicket = async ({ ticketId, agentId }, token) => {
   ensureObjectId(ticketId, "ticketId");
   ensureObjectId(agentId, "agentId");
 
-  const ticket = await fetchTicket(ticketId, token);
+  const ticket = await fetchTicketInternal(ticketId);
   const agent = await fetchAgent(agentId, token);
   if (!agent) throw { statusCode: 400, message: "Selected agent is invalid" };
   if (ticket.status === "closed") throw { statusCode: 400, message: "Closed ticket cannot be reassigned" };

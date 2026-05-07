@@ -18,7 +18,13 @@ app.use(express.json({ limit: "1mb" }));
 app.get("/health", (_req, res) => res.json({ success: true, service: "support-service" }));
 app.use("/", supportRoutes);
 app.use((err, _req, res, _next) => {
-  res.status(err.statusCode || 500).json({ success: false, message: err.message || "Internal server error" });
+  console.error("🔥 GLOBAL ERROR:", err); // <-- ADD THIS
+
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || "Internal server error",
+    stack: err.stack // <-- TEMP ONLY (remove later)
+  });
 });
 
 connectDB()

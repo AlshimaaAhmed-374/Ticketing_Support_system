@@ -31,27 +31,54 @@ export const AgentDashboardPage = () => {
 
   if (loading) return <LoadingSpinner />;
 
-  return (
+ return (
     <div>
       <h2>Agent Dashboard</h2>
+
+      {/* ASSIGNED TICKETS */}
+
       <h3>Assigned Tickets</h3>
+
       <div className="card-list">
-        {assigned.length === 0 ? <p className="empty-text">No assigned tickets.</p> : assigned.map((ticket) => (
-          <Link to={`/tickets/${ticket._id}`} className="card" key={ticket._id}>
-            <h4>{ticket.title}</h4>
-            <StatusBadge status={ticket.status} /> <PriorityBadge priority={ticket.priority} />
-          </Link>
-        ))}
+        {assigned.length === 0 ? (
+          <p className="empty-text">No assigned tickets.</p>
+        ) : (
+          assigned.map((ticket) => (
+            <Link
+              to={`/tickets/${ticket._id}`}
+              className="card"
+              key={ticket._id}
+            >
+              <h4>{ticket.title}</h4>
+
+              <StatusBadge status={ticket.status} />{" "}
+              <PriorityBadge priority={ticket.priority} />
+            </Link>
+          ))
+        )}
       </div>
 
+      {/* UNASSIGNED TICKETS */}
+
       <h3>Unassigned Tickets</h3>
+
       <div className="card-list">
-        {unassigned.length === 0 ? <p className="empty-text">No unassigned tickets.</p> : unassigned.map((ticket) => (
-          <Link to={`/tickets/${ticket._id}`} className="card" key={ticket._id}>
-            <h4>{ticket.title}</h4>
-            <StatusBadge status={ticket.status} /> <PriorityBadge priority={ticket.priority} />
-          </Link>
-        ))}
+        {unassigned.length === 0 ? (
+          <p className="empty-text">No unassigned tickets.</p>
+        ) : (
+          unassigned.map((ticket) => (
+            <div
+              className="card disabled-card"
+              key={ticket._id}
+            >
+              <h4>{ticket.title}</h4>
+
+              <StatusBadge status={ticket.status} />{" "}
+              <PriorityBadge priority={ticket.priority} />
+
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
