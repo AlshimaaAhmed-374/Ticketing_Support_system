@@ -33,6 +33,8 @@ services:
   frontend:
     build:
       context: ../frontend
+      args:
+        MODE: production
     env_file:
       - ../frontend/.env.production
     ports:
