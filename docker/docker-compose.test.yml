@@ -50,7 +50,7 @@ services:
     env_file:
       - ../auth-service/.env.test
     ports:
-      - "6001:5001"
+      - "6001:6001"
     environment:
       NODE_ENV: test
       MONGO_URI: mongodb://mongo-auth:27017/authdb_test
@@ -65,7 +65,7 @@ services:
     env_file:
       - ../ticket-service/.env.test
     ports:
-      - "6002:5002"
+      - "6002:6002"
     environment:
       NODE_ENV: test
       MONGO_URI: mongodb://mongo-ticket:27017/ticketdb_test
@@ -80,7 +80,7 @@ services:
     env_file:
       - ../support-service/.env.test
     ports:
-      - "6003:5003"
+      - "6003:6003"
     environment:
       NODE_ENV: test
     depends_on:
@@ -97,7 +97,7 @@ services:
     env_file:
       - ../notification-service/.env.test
     ports:
-      - "6004:5004"
+      - "6004:6004"
     environment:
       NODE_ENV: test
     networks:
@@ -109,7 +109,7 @@ services:
     env_file:
       - ../reporting-service/.env.test
     ports:
-      - "6005:5005"
+      - "6005:6005"
     environment:
       NODE_ENV: test
     depends_on:
