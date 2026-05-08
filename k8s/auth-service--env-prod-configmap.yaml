@@ -1,0 +1,13 @@
+apiVersion: v1
+data:
+  CORS_ORIGIN: '*'
+  JWT_EXPIRES_IN: 1d
+  JWT_SECRET: change-me-super-secret
+  MONGO_URI: mongodb://mongo-auth-prod:27017/authdb_prod
+  NODE_ENV: production
+  PORT: "7001"
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: auth-service-auth-service--env-prod
+  name: auth-service--env-prod

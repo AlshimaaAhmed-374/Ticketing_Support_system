@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  AUTH_SERVICE_URL: http://auth-service:7001
+  CORS_ORIGIN: '*'
+  INTERNAL_SERVICE_TOKEN: change-me-internal-token
+  JWT_SECRET: change-me-super-secret
+  MONGO_URI: mongodb://mongo-support:27017/supportdb
+  NODE_ENV: production
+  NOTIFICATION_SERVICE_URL: http://notification-service:7004
+  PORT: "7003"
+  REPORTING_SERVICE_URL: http://reporting-service:7005
+  TICKET_SERVICE_URL: http://ticket-service:7002
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: support-service-support-service--env-prod
+  name: support-service--env-prod

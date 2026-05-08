@@ -1,0 +1,13 @@
+apiVersion: v1
+data:
+  CORS_ORIGIN: '*'
+  INTERNAL_SERVICE_TOKEN: change-me-internal-token
+  JWT_SECRET: change-me-super-secret
+  MONGO_URI: mongodb://mongo-ticket:27017/ticketdb
+  NODE_ENV: production
+  PORT: "7002"
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: ticket-service-ticket-service--env-prod
+  name: ticket-service--env-prod

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.prod.yml
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: mongo-ticket
+  name: mongo-ticket
+spec:
+  ports:
+    - name: "29018"
+      port: 29018
+      targetPort: 27017
+  selector:
+    io.kompose.service: mongo-ticket

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.prod.yml
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: ticket-service
+  name: ticket-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: ticket-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.prod.yml
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: ticket-service
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: ticket-service--env-prod
+          image: docker-ticket-service:latest
+          imagePullPolicy: IfNotPresent
+          name: ticket-service
+          ports:
+            - containerPort: 7002
+              protocol: TCP
+      restartPolicy: Always

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.prod.yml
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: mongo-support
+  name: mongo-support
+spec:
+  ports:
+    - name: "29019"
+      port: 29019
+      targetPort: 27017
+  selector:
+    io.kompose.service: mongo-support
