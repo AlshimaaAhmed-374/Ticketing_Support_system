@@ -28,7 +28,7 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await connectDB();
-    const port = Number(process.env.PORT || 5000);
+    const port = Number(process.env.PORT || 5001);
     app.listen(port, () => {
       logInfo("Auth service started", { port });
     });

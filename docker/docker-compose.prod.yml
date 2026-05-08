@@ -1,0 +1,130 @@
+services:
+
+  mongo-auth:
+    image: mongo:7
+    container_name: mongo-auth-prod
+    ports:
+      - "29017:27017"
+    volumes:
+      - mongo_auth_prod:/data/db
+    networks:
+      - support-net
+
+  mongo-ticket:
+    image: mongo:7
+    container_name: mongo-ticket-prod
+    ports:
+      - "29018:27017"
+    volumes:
+      - mongo_ticket_prod:/data/db
+    networks:
+      - support-net
+
+  mongo-support:
+    image: mongo:7
+    container_name: mongo-support-prod
+    ports:
+      - "29019:27017"
+    volumes:
+      - mongo_support_prod:/data/db
+    networks:
+      - support-net
+
+  frontend:
+    build:
+      context: ../frontend
+    env_file:
+      - ../frontend/.env.production
+    ports:
+      - "3002:80"
+    depends_on:
+      - auth-service
+      - ticket-service
+      - support-service
+      - notification-service
+      - reporting-service
+    environment:
+      NODE_ENV: production
+    networks:
+      - support-net
+
+  auth-service:
+    build:
+      context: ../auth-service
+    env_file:
+      - ../auth-service/.env.prod
+    ports:
+      - "7001:7001"
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - mongo-auth
+    networks:
+      - support-net
+
+  ticket-service:
+    build:
+      context: ../ticket-service
+    env_file:
+      - ../ticket-service/.env.prod
+    ports:
+      - "7002:7002"
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - mongo-ticket
+    networks:
+      - support-net
+
+  support-service:
+    build:
+      context: ../support-service
+    env_file:
+      - ../support-service/.env.prod
+    ports:
+      - "7003:7003"
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - mongo-support
+      - auth-service
+      - ticket-service
+      - notification-service
+    networks:
+      - support-net
+
+  notification-service:
+    build:
+      context: ../notification-service
+    env_file:
+      - ../notification-service/.env.prod
+    ports:
+      - "7004:7004"
+    environment:
+      NODE_ENV: production
+    networks:
+      - support-net
+
+  reporting-service:
+    build:
+      context: ../reporting-service
+    env_file:
+      - ../reporting-service/.env.prod
+    ports:
+      - "7005:7005"
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - ticket-service
+      - support-service
+    networks:
+      - support-net
+
+networks:
+  support-net:
+    driver: bridge
+
+volumes:
+  mongo_auth_prod:
+  mongo_ticket_prod:
+  mongo_support_prod:

@@ -1,0 +1,128 @@
+services:
+
+  mongo-auth:
+    image: mongo:7
+    container_name: mongo-auth-dev
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_auth_dev:/data/db
+    networks:
+      - support-net
+
+  mongo-ticket:
+    image: mongo:7
+    container_name: mongo-ticket-dev
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_ticket_dev:/data/db
+    networks:
+      - support-net
+
+  mongo-support:
+    image: mongo:7
+    container_name: mongo-support-dev
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo_support_dev:/data/db
+    networks:
+      - support-net
+
+  frontend:
+    build:
+      context: ../frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - auth-service
+      - ticket-service
+      - support-service
+      - notification-service
+      - reporting-service
+    environment:
+      NODE_ENV: development
+    networks:
+      - support-net
+
+  auth-service:
+    build:
+      context: ../auth-service
+    env_file:
+      - ../auth-service/.env.dev
+    ports:
+      - "5001:5001"
+    environment:
+      NODE_ENV: development
+    depends_on:
+      - mongo-auth
+    networks:
+      - support-net
+
+  ticket-service:
+    build:
+      context: ../ticket-service
+    env_file:
+      - ../ticket-service/.env.dev
+    ports:
+      - "5002:5002"
+    environment:
+      NODE_ENV: development
+    depends_on:
+      - mongo-ticket
+    networks:
+      - support-net
+
+  support-service:
+    build:
+      context: ../support-service
+    env_file:
+      - ../support-service/.env.dev
+    ports:
+      - "5003:5003"
+    environment:
+      NODE_ENV: development
+    depends_on:
+      - mongo-support
+      - auth-service
+      - ticket-service
+      - notification-service
+    networks:
+      - support-net
+
+  notification-service:
+    build:
+      context: ../notification-service
+    env_file:
+      - ../notification-service/.env.dev
+    ports:
+      - "5004:5004"
+    environment:
+      NODE_ENV: development
+    networks:
+      - support-net
+
+  reporting-service:
+    build:
+      context: ../reporting-service
+    env_file:
+      - ../reporting-service/.env.dev
+    ports:
+      - "5005:5005"
+    environment:
+      NODE_ENV: development
+    depends_on:
+      - ticket-service
+      - support-service
+    networks:
+      - support-net
+
+networks:
+  support-net:
+    driver: bridge
+
+volumes:
+  mongo_auth_dev:
+  mongo_ticket_dev:
+  mongo_support_dev:
