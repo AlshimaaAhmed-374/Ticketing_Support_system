@@ -7,7 +7,10 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build
+#RUN npm run build
+
+ARG MODE=production
+RUN npm run build -- --mode ${MODE}
 
 # production stage
 FROM nginx:alpine
