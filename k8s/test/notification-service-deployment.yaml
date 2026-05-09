@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.test.yml
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: notification-service
+  name: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: notification-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.test.yml
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: notification-service
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: notification-service--env-test
+          image: notification-service
+          name: notification-service
+          ports:
+            - containerPort: 6004
+              protocol: TCP
+      restartPolicy: Always

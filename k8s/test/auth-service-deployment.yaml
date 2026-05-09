@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.test.yml
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: auth-service
+  name: auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: auth-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.test.yml
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: auth-service
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: auth-service--env-test
+          image: auth-service
+          name: auth-service
+          ports:
+            - containerPort: 6001
+              protocol: TCP
+      restartPolicy: Always

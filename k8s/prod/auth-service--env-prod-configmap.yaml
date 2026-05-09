@@ -3,7 +3,7 @@ data:
   CORS_ORIGIN: '*'
   JWT_EXPIRES_IN: 1d
   JWT_SECRET: change-me-super-secret
-  MONGO_URI: mongodb://mongo-auth-prod:27017/authdb_prod
+  MONGO_URI: mongodb://mongo-auth:29017/authdb
   NODE_ENV: production
   PORT: "7001"
 kind: ConfigMap

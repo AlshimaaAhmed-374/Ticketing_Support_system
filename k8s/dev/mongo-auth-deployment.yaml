@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.dev.yml
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: mongo-auth
+  name: mongo-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mongo-auth
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.dev.yml
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: mongo-auth
+    spec:
+      containers:
+        - image: mongo:7
+          name: mongo-auth-dev
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongo-auth-dev
+      restartPolicy: Always
+      volumes:
+        - name: mongo-auth-dev
+          persistentVolumeClaim:
+            claimName: mongo-auth-dev

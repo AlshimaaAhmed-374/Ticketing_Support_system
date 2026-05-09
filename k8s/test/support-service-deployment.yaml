@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.test.yml
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: support-service
+  name: support-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: support-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.test.yml
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: support-service
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: support-service--env-test
+          image: support-service
+          name: support-service
+          ports:
+            - containerPort: 6003
+              protocol: TCP
+      restartPolicy: Always

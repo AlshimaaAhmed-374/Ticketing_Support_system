@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.test.yml
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: mongo-ticket
+  name: mongo-ticket
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mongo-ticket
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.test.yml
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: mongo-ticket
+    spec:
+      containers:
+        - image: mongo:7
+          name: mongo-ticket-test
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongo-ticket-test
+      restartPolicy: Always
+      volumes:
+        - name: mongo-ticket-test
+          persistentVolumeClaim:
+            claimName: mongo-ticket-test
