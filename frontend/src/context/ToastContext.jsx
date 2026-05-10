@@ -3,11 +3,22 @@ import { ToastContainer } from "../components/ToastContainer";
 
 export const ToastContext = createContext(null);
 
+function nextToastId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    try {
+      return crypto.randomUUID();
+    } catch {
+      /* non-secure HTTP origins may restrict randomUUID */
+    }
+  }
+  return `t-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
 
   const push = (type, message) => {
-    const id = crypto.randomUUID();
+    const id = nextToastId();
     setToasts((prev) => [...prev, { id, type, message }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((x) => x.id !== id));

@@ -17,6 +17,8 @@ app.use(express.json({ limit: "1mb" }));
 
 app.get("/health", (_req, res) => res.json({ success: true, service: "ticket-service" }));
 app.use("/tickets", ticketRoutes);
+// Kubernetes ingress: same host as SPA; /api/tickets does not clash with React route /tickets
+app.use("/api/tickets", ticketRoutes);
 
 app.use((err, _req, res, _next) => {
   const statusCode = err.statusCode || 500;

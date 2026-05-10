@@ -18,6 +18,8 @@ app.use(morgan("combined"));
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/health", (_req, res) => res.json({ success: true, service: "notification-service" }));
+// In-cluster clients use http://notification-service:<port>/notify
+app.use("/api", notificationRoutes);
 app.use("/", notificationRoutes);
 app.use(errorHandler);
 

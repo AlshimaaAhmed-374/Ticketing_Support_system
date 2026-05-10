@@ -1,0 +1,755 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-config
+  namespace: ticketing-dev
+data:
+  NODE_ENV: "development"
+  PORT: "5001"
+  JWT_EXPIRES_IN: "1d"
+  CORS_ORIGIN: "*"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: auth-service-secret
+  namespace: ticketing-dev
+type: Opaque
+stringData:
+  MONGO_URI: mongodb://mongo-auth:27017/authdb
+  JWT_SECRET: change-me-super-secret
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ticket-service-config
+  namespace: ticketing-dev
+data:
+  NODE_ENV: "development"
+  PORT: "5002"
+  CORS_ORIGIN: "*"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ticket-service-secret
+  namespace: ticketing-dev
+type: Opaque
+stringData:
+  MONGO_URI: mongodb://mongo-ticket:27017/ticketdb
+  JWT_SECRET: change-me-super-secret
+  INTERNAL_SERVICE_TOKEN: change-me-internal-token
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: support-service-config
+  namespace: ticketing-dev
+data:
+  NODE_ENV: "development"
+  PORT: "5003"
+  CORS_ORIGIN: "*"
+  AUTH_SERVICE_URL: http://auth-service:5001
+  TICKET_SERVICE_URL: http://ticket-service:5002
+  NOTIFICATION_SERVICE_URL: http://notification-service:5004
+  REPORTING_SERVICE_URL: http://reporting-service:5005
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: support-service-secret
+  namespace: ticketing-dev
+type: Opaque
+stringData:
+  MONGO_URI: mongodb://mongo-support:27017/supportdb
+  JWT_SECRET: change-me-super-secret
+  INTERNAL_SERVICE_TOKEN: change-me-internal-token
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-service-config
+  namespace: ticketing-dev
+data:
+  NODE_ENV: "development"
+  PORT: "5004"
+  CORS_ORIGIN: "*"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: notification-service-secret
+  namespace: ticketing-dev
+type: Opaque
+stringData:
+  INTERNAL_SERVICE_TOKEN: change-me-internal-token
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reporting-service-config
+  namespace: ticketing-dev
+data:
+  NODE_ENV: "development"
+  PORT: "5005"
+  CORS_ORIGIN: "*"
+  TICKET_SERVICE_URL: http://ticket-service:5002
+  SUPPORT_SERVICE_URL: http://support-service:5003
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: reporting-service-secret
+  namespace: ticketing-dev
+type: Opaque
+stringData:
+  INTERNAL_SERVICE_TOKEN: change-me-internal-token
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-auth
+  namespace: ticketing-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-auth
+  template:
+    metadata:
+      labels:
+        app: mongo-auth
+    spec:
+      containers:
+        - name: mongo-auth
+          image: mongo:7
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-auth-data
+              mountPath: /data/db
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: mongo-auth-data
+          persistentVolumeClaim:
+            claimName: mongo-auth-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-auth-pvc
+  namespace: ticketing-dev
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-auth
+  namespace: ticketing-dev
+spec:
+  selector:
+    app: mongo-auth
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-ticket
+  namespace: ticketing-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-ticket
+  template:
+    metadata:
+      labels:
+        app: mongo-ticket
+    spec:
+      containers:
+        - name: mongo-ticket
+          image: mongo:7
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-ticket-data
+              mountPath: /data/db
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: mongo-ticket-data
+          persistentVolumeClaim:
+            claimName: mongo-ticket-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-ticket-pvc
+  namespace: ticketing-dev
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-ticket
+  namespace: ticketing-dev
+spec:
+  selector:
+    app: mongo-ticket
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-support
+  namespace: ticketing-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-support
+  template:
+    metadata:
+      labels:
+        app: mongo-support
+    spec:
+      containers:
+        - name: mongo-support
+          image: mongo:7
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-support-data
+              mountPath: /data/db
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: mongo-support-data
+          persistentVolumeClaim:
+            claimName: mongo-support-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-support-pvc
+  namespace: ticketing-dev
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-support
+  namespace: ticketing-dev
+spec:
+  selector:
+    app: mongo-support
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: ticketing-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      containers:
+        - name: auth-service
+          image: ticketing/auth-service:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5001
+          envFrom:
+            - configMapRef:
+                name: auth-service-config
+            - secretRef:
+                name: auth-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: ticketing-dev
+spec:
+  selector:
+    app: auth-service
+  ports:
+    - port: 5001
+      targetPort: 5001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-service
+  namespace: ticketing-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ticket-service
+  template:
+    metadata:
+      labels:
+        app: ticket-service
+    spec:
+      containers:
+        - name: ticket-service
+          image: ticketing/ticket-service:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5002
+          envFrom:
+            - configMapRef:
+                name: ticket-service-config
+            - secretRef:
+                name: ticket-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5002
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5002
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5002
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-service
+  namespace: ticketing-dev
+spec:
+  selector:
+    app: ticket-service
+  ports:
+    - port: 5002
+      targetPort: 5002
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: support-service
+  namespace: ticketing-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: support-service
+  template:
+    metadata:
+      labels:
+        app: support-service
+    spec:
+      containers:
+        - name: support-service
+          image: ticketing/support-service:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5003
+          envFrom:
+            - configMapRef:
+                name: support-service-config
+            - secretRef:
+                name: support-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5003
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5003
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5003
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: support-service
+  namespace: ticketing-dev
+spec:
+  selector:
+    app: support-service
+  ports:
+    - port: 5003
+      targetPort: 5003
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: ticketing-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: ticketing/notification-service:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5004
+          envFrom:
+            - configMapRef:
+                name: notification-service-config
+            - secretRef:
+                name: notification-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5004
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5004
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5004
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: ticketing-dev
+spec:
+  selector:
+    app: notification-service
+  ports:
+    - port: 5004
+      targetPort: 5004
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reporting-service
+  namespace: ticketing-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: reporting-service
+  template:
+    metadata:
+      labels:
+        app: reporting-service
+    spec:
+      containers:
+        - name: reporting-service
+          image: ticketing/reporting-service:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5005
+          envFrom:
+            - configMapRef:
+                name: reporting-service-config
+            - secretRef:
+                name: reporting-service-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 5005
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5005
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5005
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reporting-service
+  namespace: ticketing-dev
+spec:
+  selector:
+    app: reporting-service
+  ports:
+    - port: 5005
+      targetPort: 5005
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: ticketing-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+        # Bump this string after rebuilding the frontend image so apply forces a new rollout (same image tag otherwise stays cached on running pods).
+        ticketing.dev/configVersion: "k8s-api-paths-v2"
+    spec:
+      containers:
+        - name: frontend
+          image: ticketing/frontend:k8s-dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: ticketing-dev
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ticketing-dev-ingress
+  namespace: ticketing-dev
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "4m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: dev.ticketing.local
+      http:
+        paths:
+          # Longer prefixes first (/api/* avoids clashes with SPA routes /tickets, /notifications)
+          - path: /api/tickets
+            pathType: Prefix
+            backend:
+              service:
+                name: ticket-service
+                port:
+                  number: 5002
+          - path: /api/notifications
+            pathType: Prefix
+            backend:
+              service:
+                name: notification-service
+                port:
+                  number: 5004
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 5001
+          - path: /api/notify
+            pathType: Prefix
+            backend:
+              service:
+                name: notification-service
+                port:
+                  number: 5004
+          - path: /assign
+            pathType: Prefix
+            backend:
+              service:
+                name: support-service
+                port:
+                  number: 5003
+          - path: /respond
+            pathType: Prefix
+            backend:
+              service:
+                name: support-service
+                port:
+                  number: 5003
+          - path: /resolve
+            pathType: Prefix
+            backend:
+              service:
+                name: support-service
+                port:
+                  number: 5003
+          - path: /support
+            pathType: Prefix
+            backend:
+              service:
+                name: support-service
+                port:
+                  number: 5003
+          - path: /report
+            pathType: Prefix
+            backend:
+              service:
+                name: reporting-service
+                port:
+                  number: 5005
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80

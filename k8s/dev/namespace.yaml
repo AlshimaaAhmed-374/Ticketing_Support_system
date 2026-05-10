@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ticketing-dev
+  labels:
+    app.kubernetes.io/name: ticketing-system
+    app.kubernetes.io/environment: dev

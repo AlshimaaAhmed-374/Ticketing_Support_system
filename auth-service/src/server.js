@@ -23,6 +23,8 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/auth", authRoutes);
+// Kubernetes ingress: browser calls same host under /api/auth/* (avoids separate API hostnames)
+app.use("/api/auth", authRoutes);
 app.use(errorHandler);
 
 const startServer = async () => {
