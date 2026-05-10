@@ -3,7 +3,7 @@ data:
   CORS_ORIGIN: '*'
   INTERNAL_SERVICE_TOKEN: change-me-internal-token
   JWT_SECRET: change-me-super-secret
-  MONGO_URI: mongodb://mongo-ticket:29017/ticketdb
+  MONGO_URI: mongodb://mongo-ticket:29018/ticketdb
   NODE_ENV: production
   PORT: "7002"
 kind: ConfigMap

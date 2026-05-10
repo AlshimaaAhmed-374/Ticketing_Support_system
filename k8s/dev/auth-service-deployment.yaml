@@ -24,7 +24,7 @@ spec:
         - envFrom:
             - configMapRef:
                 name: auth-service--env-dev
-          image: auth-service
+          image: auth-service:latest
           name: auth-service
           ports:
             - containerPort: 5001

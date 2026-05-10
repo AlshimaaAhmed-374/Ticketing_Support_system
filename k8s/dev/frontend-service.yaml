@@ -1,16 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.dev.yml
-    kompose.version: 1.38.0 (a8f5d1cbd)
+  name: frontend
   labels:
     io.kompose.service: frontend
-  name: frontend
 spec:
-  ports:
-    - name: "3000"
-      port: 3000
-      targetPort: 80
+  type: NodePort   # 👈 أهم سطر
   selector:
     io.kompose.service: frontend
+  ports:
+    - name: "3000"
+      port: 3000        # داخل الكلاستر
+      targetPort: 80    # داخل الكونتينر
+      nodePort: 30080   # 👈 ده اللي هتفتحه من برا

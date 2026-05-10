@@ -1,10 +1,10 @@
 apiVersion: v1
 data:
-  VITE_AUTH_SERVICE_URL: http://auth-service:7001
-  VITE_NOTIFICATION_SERVICE_URL: http://notification-service:7004
+  VITE_AUTH_SERVICE_URL: http://auth-service:7001 ##
+  VITE_NOTIFICATION_SERVICE_URL: http://notification-service:7004 ##
   VITE_REPORTING_SERVICE_URL: http://reporting-service:7005
-  VITE_SUPPORT_SERVICE_URL: http://support-service:7003
-  VITE_TICKET_SERVICE_URL: http://ticket-service:7002
+  VITE_SUPPORT_SERVICE_URL: http://support-service:7003 ##
+  VITE_TICKET_SERVICE_URL: http://ticket-service:7002 ##
 kind: ConfigMap
 metadata:
   labels:

@@ -4,12 +4,12 @@ data:
   CORS_ORIGIN: '*'
   INTERNAL_SERVICE_TOKEN: change-me-internal-token
   JWT_SECRET: change-me-super-secret
-  MONGO_URI: mongodb://mongo-support:29017/supportdb
+  MONGO_URI: mongodb://mongo-support:29019/supportdb
   NODE_ENV: production
-  NOTIFICATION_SERVICE_URL: http://localhost:7004
+  NOTIFICATION_SERVICE_URL: http://notification-service:7004
   PORT: "7003"
-  REPORTING_SERVICE_URL: http://localhost:7005
-  TICKET_SERVICE_URL: http://localhost:7002
+  REPORTING_SERVICE_URL: http://reporting-service:7005
+  TICKET_SERVICE_URL: http://ticket-service:7002
 kind: ConfigMap
 metadata:
   labels:

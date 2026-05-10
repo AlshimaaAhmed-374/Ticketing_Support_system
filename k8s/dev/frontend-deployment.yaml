@@ -24,7 +24,7 @@ spec:
         - env:
             - name: NODE_ENV
               value: development
-          image: frontend
+          image: docker-frontend:latest
           name: frontend
           ports:
             - containerPort: 80
